@@ -1,7 +1,7 @@
 module.exports = {
     execute: function(group) {
         return
-        for (creepName in Game.creeps) {
+        for (var creepName in Game.creeps) {
             var creep = Game.creeps[creepName]
             if (creep.memory.group !== group.name) {
                 continue

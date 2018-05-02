@@ -1,4 +1,4 @@
-tasks = {
+var tasks = {
     fillSpawn: require('fillSpawn'),
     upgradeRoomController: require('upgradeRoomController'),
     spawnCreeps: require('spawnCreeps'),
@@ -63,7 +63,7 @@ function allocateCreeps()
 
 function processGroups()
 {
-    for (name in Memory.groups) {
+    for (var name in Memory.groups) {
         var group = Memory.groups[name]
         tasks[group.task].execute(group)
     }

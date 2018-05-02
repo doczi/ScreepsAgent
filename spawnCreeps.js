@@ -1,8 +1,8 @@
 const BASIC_WORKER = [ WORK, CARRY, CARRY, MOVE, MOVE ]
 const BASIC_ATTACKER = [ ATTACK, ATTACK, MOVE, MOVE ]
 
-countPartsInRoom = function(room) {
-    creepsInRoom = room.find(FIND_CREEPS)
+var countPartsInRoom = function(room) {
+    var creepsInRoom = room.find(FIND_CREEPS)
     var partsCount = {}
     partsCount[MOVE] = 0
     partsCount[WORK] = 0
@@ -14,7 +14,7 @@ countPartsInRoom = function(room) {
     partsCount[CLAIM] = 0
     for (var i = 0; i < creepsInRoom.length; ++i) {
         var creep = creepsInRoom[i]
-        for (part in partsCount) {
+        for (var part in partsCount) {
             partsCount[part] += creep.getActiveBodyparts(part)
         }
     }
@@ -26,13 +26,14 @@ module.exports = {
         if (Memory.nextCreepNumber === undefined) {
             Memory.nextCreepNumber = 0
         }
-        for (spawnName in Game.spawns) {
+        for (var spawnName in Game.spawns) {
             var spawn = Game.spawns[spawnName]
             if (spawn.memory.group !== group.name) {
                 continue
             }
-            partsCount = countPartsInRoom(spawn.room)
-            var creepToSpawn
+            var partsCount = countPartsInRoom(spawn.room)
+            var creepToSpawn = BASIC_WORKER
+            var creepName = 'Worker'
             //if (partsCount[WORK]*partsCount[WORK] + 10 <= partsCount[ATTACK]) {
                 creepToSpawn = BASIC_WORKER
                 creepName = 'Worker'
