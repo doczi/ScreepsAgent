@@ -2,7 +2,7 @@ module.exports = {
     execute: function(group) {
         var controller = Game.getObjectById(group.controllerId)
         var source = Game.getObjectById(group.sourceId)
-        var path = controller.pos.findPathTo(source, { ignoreCreeps: true })
+        var path = Room.deserializePath(group.path)
         for (var i = 0; i < path.length; i++) {
             controller.room.getPositionAt(path[i].x, path[i].y).createConstructionSite(STRUCTURE_ROAD)
         }
@@ -33,6 +33,7 @@ module.exports = {
         group.task = "upgradeRoomController"
         group.controllerId = controller.id
         group.sourceId = source.id
+        group.path = controller.pos.findPathTo(source, { ignoreCreeps: true, serialize: true })
         Memory.groups[name] = group
     }
 }

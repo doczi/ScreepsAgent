@@ -2,7 +2,7 @@ module.exports = {
     execute: function(group) {
         var spawn = Game.getObjectById(group.spawnId)
         var source = Game.getObjectById(group.sourceId)
-        var path = spawn.pos.findPathTo(source, { ignoreCreeps: true })
+        var path = Room.deserializePath(group.path)
         for (var i = 0; i < path.length; i++) {
             spawn.room.getPositionAt(path[i].x, path[i].y).createConstructionSite(STRUCTURE_ROAD)
         }
@@ -33,6 +33,7 @@ module.exports = {
         group.task = "fillSpawn"
         group.spawnId = spawn.id
         group.sourceId = source.id
+        group.path = spawn.pos.findPathTo(source, { ignoreCreeps: true, serialize: true })
         Memory.groups[name] = group
     }
 };

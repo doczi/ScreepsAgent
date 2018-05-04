@@ -16,6 +16,10 @@ function cleanUpMemory()
 
 function updateGroups()
 {
+    /*
+    Memory.groups = {}
+    return
+    //*/
     if (Memory.groups === undefined) {
         Memory.groups = {}
     }
