@@ -11,8 +11,11 @@ CreepAllocator.prototype.getAvailableCount = function(role) {
 
 CreepAllocator.prototype.reset = function() {
     for (const creepId in this.creeps) {
-        const role = this.creeps[creepId].memory.role
-        this.pool[role] = this.getAvailableCount(role) + 1 
+        const creep = this.creeps[creepId]
+        const role = creep.memory.role
+        if (!creep.spawning) {
+            this.pool[role] = this.getAvailableCount(role) + 1
+        }
     }
 }
 

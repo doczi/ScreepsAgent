@@ -1,3 +1,5 @@
+Assert = require('Assert')
+
 function UpgradeRoomController(game, memory, controller) {
     var id = memory.controllers[controller.id].upgradeRoomControllerId
     if (id === undefined) {
@@ -41,17 +43,22 @@ UpgradeRoomController.prototype.execute = function() {
             continue
         }
         if (creep.pos.isNearTo(this.source) && (creep.carry.energy < creep.carryCapacity)) {
-            creep.harvest(this.source)
+            Assert.check(creep.harvest(this.source))
         } else if (creep.carry.energy <= 0) {
-            creep.moveTo(this.source)
+            if (creep.fatigue <= 0) {
+                Assert.check(creep.moveTo(this.source))
+            }
         } else {
-            var roads = creep.pos.findInRange(FIND_CONSTRUCTION_SITES, 3)
-            if (roads.length > 0) {
-                creep.build(roads[0])
+            const constructions = creep.pos.findInRange(FIND_MY_CONSTRUCTION_SITES, 3)
+            const structures = creep.pos.findInRange(FIND_STRUCTURES, 3, { filter: function(structure) { return structure.hits < structure.hitsMax } })
+            if (constructions.length > 0) {
+                Assert.check(creep.build(constructions[0]))
+            } else if (structures.length > 0) {
+                Assert.check(creep.repair(structures[0]))
             } else if (creep.pos.inRangeTo(this.controller, 3)) {
-                creep.upgradeController(this.controller)
-            } else {
-                creep.moveTo(this.controller)
+                Assert.check(creep.upgradeController(this.controller))
+            } else if (creep.fatigue <= 0) {
+                Assert.check(creep.moveTo(this.controller))
             }
         }
     }

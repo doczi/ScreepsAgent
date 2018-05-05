@@ -1,46 +1,51 @@
 var CreepAllocator = require('CreepAllocator')
-
-
-
-function assertEquals(expected, actual) {
-    if (!(expected === actual)) throw new Error("Assertion '" + expected + " === " + actual + " 'failed")
-}
-
+var Assert = require('Assert')
 
 
 module.exports = {
     testConstructor: function() {
         var creeps = {
             creep1: {
+                spawning: false,
                 memory: {
                     role: 'worker'
                 }
             },
             creep2: {
+                spawning: false,
+                memory: {
+                    role: 'soldier'
+                }
+            },
+            creep3: {
+                spawning: true,
                 memory: {
                     role: 'soldier'
                 }
             }
         }
         var allocator = new CreepAllocator(creeps)
-        assertEquals(1, allocator.pool['worker'])
-        assertEquals(1, allocator.pool['soldier'])
+        Assert.assertEquals(1, allocator.pool['worker'])
+        Assert.assertEquals(1, allocator.pool['soldier'])
     },
 
     testAllocateFixed: function() {
         const mine = { id: 'mine' }
         var creeps = {
             creep1: {
+                spawning: false,
                 memory: {
                     role: 'worker'
                 }
             },
             creep2: {
+                spawning: false,
                 memory: {
                     role: 'worker'
                 }
             },
             creep3: {
+                spawning: false,
                 memory: {
                     role: 'soldier'
                 }
@@ -49,19 +54,19 @@ module.exports = {
         var allocator = new CreepAllocator(creeps)
 
         allocator.allocateFixed(mine, 'worker', 1)
-        assertEquals(1, allocator.pool['worker'])
-        assertEquals(1, allocator.pool['soldier'])
-        assertEquals(1, allocator.allocations[mine.id]['worker'])
+        Assert.assertEquals(1, allocator.pool['worker'])
+        Assert.assertEquals(1, allocator.pool['soldier'])
+        Assert.assertEquals(1, allocator.allocations[mine.id]['worker'])
 
         allocator.allocateFixed(mine, 'worker', 2)
-        assertEquals(0, allocator.pool['worker'])
-        assertEquals(1, allocator.pool['soldier'])
-        assertEquals(2, allocator.allocations[mine.id]['worker'])
+        Assert.assertEquals(0, allocator.pool['worker'])
+        Assert.assertEquals(1, allocator.pool['soldier'])
+        Assert.assertEquals(2, allocator.allocations[mine.id]['worker'])
 
         allocator.allocateFixed(mine, 'worker', 1)
-        assertEquals(0, allocator.pool['worker'])
-        assertEquals(1, allocator.pool['soldier'])
-        assertEquals(2, allocator.allocations[mine.id]['worker'])
+        Assert.assertEquals(0, allocator.pool['worker'])
+        Assert.assertEquals(1, allocator.pool['soldier'])
+        Assert.assertEquals(2, allocator.allocations[mine.id]['worker'])
     },
 
     testAllocateRatio: function() {
@@ -69,21 +74,25 @@ module.exports = {
         const build = { id: 'build' }
         var creeps = {
             creep1: {
+                spawning: false,
                 memory: {
                     role: 'worker'
                 }
             },
             creep2: {
+                spawning: false,
                 memory: {
                     role: 'worker'
                 }
             },
             creep3: {
+                spawning: false,
                 memory: {
                     role: 'worker'
                 }
             },
             creep4: {
+                spawning: false,
                 memory: {
                     role: 'worker'
                 }
@@ -92,23 +101,23 @@ module.exports = {
         var allocator = new CreepAllocator(creeps)
 
         allocator.allocateRatio(mine, 'worker', 0.5)
-        assertEquals(2, allocator.pool['worker'])
-        assertEquals(2, allocator.allocations[mine.id]['worker'])
+        Assert.assertEquals(2, allocator.pool['worker'])
+        Assert.assertEquals(2, allocator.allocations[mine.id]['worker'])
 
         allocator.allocateRatio(build, 'worker', 0.75)
-        assertEquals(1, allocator.pool['worker'])
-        assertEquals(2, allocator.allocations[mine.id]['worker'])
-        assertEquals(1, allocator.allocations[build.id]['worker'])
+        Assert.assertEquals(1, allocator.pool['worker'])
+        Assert.assertEquals(2, allocator.allocations[mine.id]['worker'])
+        Assert.assertEquals(1, allocator.allocations[build.id]['worker'])
 
         allocator.allocateFixed(mine, 'worker', 1)
-        assertEquals(0, allocator.pool['worker'])
-        assertEquals(3, allocator.allocations[mine.id]['worker'])
-        assertEquals(1, allocator.allocations[build.id]['worker'])
+        Assert.assertEquals(0, allocator.pool['worker'])
+        Assert.assertEquals(3, allocator.allocations[mine.id]['worker'])
+        Assert.assertEquals(1, allocator.allocations[build.id]['worker'])
 
         allocator.allocateFixed(mine, 'worker', 1)
-        assertEquals(0, allocator.pool['worker'])
-        assertEquals(3, allocator.allocations[mine.id]['worker'])
-        assertEquals(1, allocator.allocations[build.id]['worker'])
+        Assert.assertEquals(0, allocator.pool['worker'])
+        Assert.assertEquals(3, allocator.allocations[mine.id]['worker'])
+        Assert.assertEquals(1, allocator.allocations[build.id]['worker'])
     },
 
     testReallocate: function() {
@@ -117,24 +126,28 @@ module.exports = {
         const idle = { id: 'idle' }
         var creeps = {
             creep1: {
+                spawning: false,
                 memory: {
                     role: 'worker',
                     groupId: mine.id
                 }
             },
             creep2: {
+                spawning: false,
                 memory: {
                     role: 'miner',
                     groupId: mine.id
                 }
             },
             creep3: {
+                spawning: false,
                 memory: {
                     role: 'worker',
                     groupId: build.id
                 }
             },
             creep4: {
+                spawning: false,
                 memory: {
                     role: 'worker'
                 }
@@ -143,14 +156,14 @@ module.exports = {
         allocator = new CreepAllocator(creeps)
         
         allocator.reallocate(mine)
-        assertEquals(1, allocator.allocations[mine.id]['worker'])
-        assertEquals(1, allocator.allocations[mine.id]['miner'])
+        Assert.assertEquals(1, allocator.allocations[mine.id]['worker'])
+        Assert.assertEquals(1, allocator.allocations[mine.id]['miner'])
         
         allocator.allocateFixed(idle, 'worker', 2)
-        assertEquals(2, allocator.allocations[idle.id]['worker'])
+        Assert.assertEquals(2, allocator.allocations[idle.id]['worker'])
         
         allocator.reallocate(build)
-        assertEquals(0, allocator.allocations[build.id]['worker'])
+        Assert.assertEquals(0, allocator.allocations[build.id]['worker'])
     },
 
     testAssignCreeps: function() {
@@ -186,9 +199,9 @@ module.exports = {
         allocator.allocateFixed(build, 'worker', 2)
         allocator.reallocate(mine)
         allocator.assignCreeps()
-        assertEquals(mine.id, creeps.creep1.memory.groupId)
-        assertEquals(mine.id, creeps.creep2.memory.groupId)
-        assertEquals(build.id, creeps.creep3.memory.groupId)
-        assertEquals(build.id, creeps.creep4.memory.groupId)
+        Assert.assertEquals(mine.id, creeps.creep1.memory.groupId)
+        Assert.assertEquals(mine.id, creeps.creep2.memory.groupId)
+        Assert.assertEquals(build.id, creeps.creep3.memory.groupId)
+        Assert.assertEquals(build.id, creeps.creep4.memory.groupId)
     }
 }

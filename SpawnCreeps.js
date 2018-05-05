@@ -35,8 +35,8 @@ SpawnCreeps.prototype.execute = function() {
         }
         var creepToSpawn = BASIC_WORKER
         var role = 'worker'
-        if (spawn.spawnCreep(creepToSpawn, role + Memory.nextId, { memory: { role: role} }) == OK) {
-            Memory.nextId++
+        if (spawn.spawnCreep(creepToSpawn, role + this.globalMemory.nextId, { memory: { role: role} }) == OK) {
+            this.globalMemory.nextId++
         }
     }
 }

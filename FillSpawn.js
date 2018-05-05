@@ -1,3 +1,5 @@
+Assert = require('Assert')
+
 function FillSpawn(game, memory, spawn) {
     var id = spawn.memory.fillSpawnId
     if (id === undefined) {
@@ -28,7 +30,9 @@ function FillSpawn(game, memory, spawn) {
 FillSpawn.prototype.allocateSpawns = function(allocator) {}
 
 FillSpawn.prototype.allocateCreeps = function(allocator) {
-    allocator.allocateFixed(this, 'worker', 1)
+    if (this.spawn.energy < this.spawn.energyCapacity) {
+        allocator.allocateFixed(this, 'worker', 1)
+    }
 }
 
 FillSpawn.prototype.execute = function() {
@@ -41,17 +45,22 @@ FillSpawn.prototype.execute = function() {
             continue
         }
         if (creep.pos.isNearTo(this.source) && (creep.carry.energy < creep.carryCapacity)) {
-            creep.harvest(this.source)
+            Assert.check(creep.harvest(this.source))
         } else if (creep.carry.energy <= 0) {
-            creep.moveTo(this.source)
+            if (creep.fatigue <= 0) {
+                Assert.check(creep.moveTo(this.source))
+            }
         } else {
-            var roads = creep.pos.findInRange(FIND_CONSTRUCTION_SITES, 3)
-            if (roads.length > 0) {
-                creep.build(roads[0])
+            const constructions = creep.pos.findInRange(FIND_MY_CONSTRUCTION_SITES, 3)
+            const structures = creep.pos.findInRange(FIND_STRUCTURES, 3, { filter: function(structure) { return structure.hits < structure.hitsMax } })
+            if (constructions.length > 0) {
+                Assert.check(creep.build(constructions[0]))
+            } else if (structures.length > 0) {
+                Assert.check(creep.repair(structures[0]))
             } else if (creep.pos.isNearTo(this.spawn)) {
-                creep.transfer(this.spawn, RESOURCE_ENERGY)
-            } else {
-                creep.moveTo(this.spawn)
+                Assert.check(creep.transfer(this.spawn, RESOURCE_ENERGY))
+            } else if (creep.fatigue <= 0) {
+                Assert.check(creep.moveTo(this.spawn))
             }
         }
     }
