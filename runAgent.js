@@ -1,18 +1,40 @@
 CreepAllocator = require('CreepAllocator')
-var tasks = {
-    SpawnCreeps: require('SpawnCreeps'),
-    fillSpawn: require('fillSpawn'),
-    upgradeRoomController: require('upgradeRoomController'),
-    expand: require('expand')
-}
+SpawnCreeps = require('SpawnCreeps')
+FillSpawn = require('FillSpawn')
+UpgradeRoomController = require('UpgradeRoomController')
+
+
+var groups = []
 
 function initializeMemory()
 {
+    if (Memory.nextId === undefined) {
+        Memory.nextId = 0
+    }
+    if (Memory.controllers === undefined) {
+        Memory.controllers = {}
+    }
+    if (Memory.sources === undefined) {
+        Memory.sources = {}
+    }
     if (Memory.groups === undefined) {
         Memory.groups = {}
     }
-    if (Memory.nextCreepNumber === undefined) {
-        Memory.nextCreepNumber = 0
+    for (var spawnId in Game.spawns) {
+        var spawn = Game.spawns[spawnId]
+        spawn.memory.role = 'spawn'
+
+        var controller = spawn.room.controller
+        if (Memory.controllers[controller.id] === undefined) {
+            Memory.controllers[controller.id] = {}
+        }
+
+        var sources = spawn.room.find(FIND_SOURCES)
+        for (var i = 0; i < sources.length; ++i) {
+            if (Memory.sources[sources[i].id] === undefined) {
+                Memory.sources[sources[i].id] = { users: 0 }
+            }
+        }
     }
     for (const creepId in Memory.creeps) {
         if (Game.creeps[creepId] === undefined) {
@@ -24,50 +46,36 @@ function initializeMemory()
             Memory.spawns[spawnId] = undefined
         }
     }
-    for (var spawnId in Game.spawns) {
-        Game.spawns[spawnId].memory.role = 'spawn'
-    }
 }
 
 function updateGroups()
 {
-    if (Memory.groups.fillSpawn1 === undefined) {
-        var spawn = Game.spawns['Spawn1']
-        var source = spawn.room.find(FIND_SOURCES)[0]
-        tasks.fillSpawn.create("fillSpawn1", spawn, source)
-    }
-    if (Memory.groups.upgradeRoomController1 === undefined) {
-        var spawn = Game.spawns['Spawn1']
+    groups.spawnCreeps = new SpawnCreeps(Game, Memory)
+    for (spawnId in Game.spawns) {
+        var spawn = Game.spawns[spawnId]
+        groups.push(new FillSpawn(Game, Memory, spawn))
+
         var controller = spawn.room.controller
-        var sources = spawn.room.find(FIND_SOURCES)
-        var source = sources[1 % sources.length]
-        tasks.upgradeRoomController.create("upgradeRoomController1", controller, source)
-    }
-    if (Memory.groups.spawnCreeps1 === undefined) {
-        tasks.spawnCreeps.create("spawnCreeps1")
-    }
-    if (Memory.groups.expand1 === undefined) {
-        tasks.expand.create("expand1")
+        groups.push(new UpgradeRoomController(Game, Memory, controller))
     }
 }
 
 function allocateCreeps()
 {
+    var spawnAllocator = new CreepAllocator(Game.spawns)
     var creepAllocator = new CreepAllocator(Game.creeps)
-    creepAllocator.allocateFixed('fillSpawn1', 'worker', 2)
-    creepAllocator.allocateRatio('upgradeRoomController1', 'worker', 1)
-    creepAllocator.assignCreeps()
-
-    var spawnAllocator = new CreepAllocator(Game.creeps)
-    spawnAllocator.allocateRatio('spawnCreeps1', 'spawn', 1)
+    for (var groupId in groups) {
+        groups[groupId].allocateSpawns(spawnAllocator)
+        groups[groupId].allocateCreeps(creepAllocator)
+    }
     spawnAllocator.assignCreeps()
+    creepAllocator.assignCreeps()
 }
 
 function processGroups()
 {
-    for (var name in Memory.groups) {
-        var group = Memory.groups[name]
-        tasks[group.task].execute(group)
+    for (var groupId in groups) {
+        groups[groupId].execute()
     }
 }
 
