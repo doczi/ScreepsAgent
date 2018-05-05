@@ -6,7 +6,6 @@ module.exports = {
     testConstructor: function() {
         var creeps = {
             creep1: {
-                spawning: false,
                 memory: {
                     role: 'worker'
                 }
@@ -151,6 +150,12 @@ module.exports = {
                 memory: {
                     role: 'worker'
                 }
+            },
+            creep5: {
+                spawning: true,
+                memory: {
+                    role: 'worker'
+                }
             }
         }
         allocator = new CreepAllocator(creeps)
@@ -171,24 +176,34 @@ module.exports = {
         const build = { id: 'build' }
         var creeps = {
             creep1: {
+                spawning: false,
                 memory: {
                     role: 'worker',
                     groupId: mine.id
                 }
             },
             creep2: {
+                spawning: false,
                 memory: {
                     role: 'miner',
                     groupId: mine.id
                 }
             },
             creep3: {
+                spawning: false,
                 memory: {
                     role: 'worker',
                     groupId: build.id
                 }
             },
             creep4: {
+                spawning: false,
+                memory: {
+                    role: 'worker'
+                }
+            },
+            creep5: {
+                spawning: true,
                 memory: {
                     role: 'worker'
                 }

@@ -51,8 +51,11 @@ CreepAllocator.prototype.assignCreeps = function() {
         const creep = this.creeps[creepId]
         const groupId = creep.memory.groupId
         const role = creep.memory.role
+        if (creep.spawning) {
+            continue
+        }
         if ((groupId in this.allocations) && (role in this.allocations[groupId]) && (this.allocations[groupId][role] > 0)) {
-            this.allocations[creep.memory.groupId][creep.memory.role]--
+            this.allocations[groupId][role]--
         } else {
             if (role in extras) {
                 extras[role].push(creep)
