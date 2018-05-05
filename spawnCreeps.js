@@ -1,7 +1,13 @@
-const BASIC_WORKER = [ WORK, CARRY, CARRY, MOVE, MOVE ]
-const BASIC_ATTACKER = [ ATTACK, ATTACK, MOVE, MOVE ]
+function SpawnCreeps(spawns, state) {
+    this.spawns = spawns
+    this.state = state
+            var group = {}
+        group.name = name
+        group.task = "spawnCreeps"
+        Memory.groups[name] = group
+}
 
-var countPartsInRoom = function(room) {
+SpawnCreeps.prototype.countPartsInRoom = function(room) {
     var creepsInRoom = room.find(FIND_CREEPS)
     var partsCount = {}
     partsCount[MOVE] = 0
@@ -21,35 +27,29 @@ var countPartsInRoom = function(room) {
     return partsCount
 }
 
-module.exports = {
-    execute: function(group) {
-        if (Memory.nextCreepNumber === undefined) {
-            Memory.nextCreepNumber = 0
+SpawnCreeps.prototype.execute = function() {
+    const BASIC_WORKER = [ WORK, CARRY, CARRY, MOVE, MOVE ]
+    const BASIC_ATTACKER = [ ATTACK, ATTACK, MOVE, MOVE ]
+
+    for (var spawnName in Game.spawns) {
+        var spawn = Game.spawns[spawnName]
+        if (spawn.memory.group !== group.name) {
+            continue
         }
-        for (var spawnName in Game.spawns) {
-            var spawn = Game.spawns[spawnName]
-            if (spawn.memory.group !== group.name) {
-                continue
-            }
-            var partsCount = countPartsInRoom(spawn.room)
-            var creepToSpawn = BASIC_WORKER
-            var creepName = 'Worker'
-            //if (partsCount[WORK]*partsCount[WORK] + 10 <= partsCount[ATTACK]) {
-                creepToSpawn = BASIC_WORKER
-                creepName = 'Worker'
-            /*} else {
-                creepToSpawn = BASIC_ATTACKER
-                creepName = 'Attacker'
-            }*/
-            if (spawn.spawnCreep(creepToSpawn, creepName + Memory.nextCreepNumber) == OK) {
-                Memory.nextCreepNumber += 1
-            }
+        var partsCount = countPartsInRoom(spawn.room)
+        var creepToSpawn = BASIC_WORKER
+        var creepName = 'Worker'
+        //if (partsCount[WORK]*partsCount[WORK] + 10 <= partsCount[ATTACK]) {
+            creepToSpawn = BASIC_WORKER
+            creepName = 'Worker'
+        /*} else {
+            creepToSpawn = BASIC_ATTACKER
+            creepName = 'Attacker'
+        }*/
+        if (spawn.spawnCreep(creepToSpawn, creepName + Memory.nextCreepNumber) == OK) {
+            Memory.nextCreepNumber += 1
         }
-    },
-    create: function(name) {
-        var group = {}
-        group.name = name
-        group.task = "spawnCreeps"
-        Memory.groups[name] = group
     }
 }
+
+module.exports = SpawnCreeps

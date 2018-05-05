@@ -15,4 +15,4 @@ module.exports = {
         group.task = "expand"
         Memory.groups[name] = group
     }
-};
+}
