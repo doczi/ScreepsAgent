@@ -10,4 +10,5 @@ function runTestSuite(suiteName) {
 
 module.exports = function() {
     runTestSuite('CreepAllocatorTest')
+    runTestSuite('SpiralTest')
 }

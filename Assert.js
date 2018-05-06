@@ -9,5 +9,11 @@ module.exports = {
         if (!(expected === actual)) {
             throw new Error("Assertion '" + expected + " === " + actual + " 'failed")
         }
+    },
+
+    assertTrue: function(value) {
+        if (!value) {
+            throw new Error('Assertion failed')
+        }
     }
 }
