@@ -47,7 +47,7 @@ UpgradeRoomController.prototype.execute = function() {
                 Assert.check(creep.moveTo(this.source))
             }
         } else {
-            const constructions = creep.pos.findInRange(FIND_MY_CONSTRUCTION_SITES, 3)
+            const constructions = creep.pos.findInRange(FIND_MY_CONSTRUCTION_SITES, 3, { filter: { structureType: STRUCTURE_ROAD } })
             const structures = creep.pos.findInRange(FIND_STRUCTURES, 3, { filter: function(structure) { return structure.hits < structure.hitsMax } })
             if (constructions.length > 0) {
                 Assert.check(creep.build(constructions[0]))

@@ -1,4 +1,5 @@
 Assert = require('Assert')
+Spiral = require('Spiral')
 
 function Build(game, memory, spawn) {
     var id = spawn.memory.buildId
@@ -34,20 +35,20 @@ Build.prototype.allocateCreeps = function(allocator) {
     allocator.allocateFixed(this, 'worker', 1)
 }
 
+Build.prototype.createExtensions = function() {
+    const extensionLimit = CONTROLLER_STRUCTURES.extension[this.spawn.room.controller.level]
+    const extensionCount = this.spawn.room.find(FIND_STRUCTURES, { filter: { structureType: STRUCTURE_EXTENSION } }).length
+    if (extensionCount >= extensionLimit) {
+        return
+    }
+    var spiral = new Spiral(this.spawn.pos, 2)
+    while (spiral.next().createConstructionSite(STRUCTURE_EXTENSION) === ERR_INVALID_TARGET);
+}
+
+
 Build.prototype.execute = function() {
-    const offsets = [
-        { x: -2, y:  0 },
-        { x: -2, y: -2 },
-        { x:  0, y: -2 },
-        { x:  2, y: -2 },
-        { x:  2, y:  0 },
-        { x:  2, y:  2 },
-        { x:  0, y:  2 },
-        { x: -2, y:  2 },
-        
-    ]
-    for (var i = 0; i < offsets.length; i++) {
-        this.spawn.room.getPositionAt(this.spawn.pos.x + offsets[i].x, this.spawn.pos.y + offsets[i].y).createConstructionSite(STRUCTURE_EXTENSION)
+    if (this.spawn.room.find(FIND_MY_CONSTRUCTION_SITES).length <= 0) {
+        this.createExtensions()
     }
     for (var creepId in this.creeps) {
         var creep = this.creeps[creepId]
