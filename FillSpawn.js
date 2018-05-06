@@ -21,6 +21,7 @@ function FillSpawn(game, memory, spawn) {
     }
 
     this.id = id
+    this.creeps = {}
     this.game = game
     this.spawn = game.getObjectById(this.memory.spawnId)
     this.source = game.getObjectById(this.memory.sourceId)
@@ -39,11 +40,8 @@ FillSpawn.prototype.execute = function() {
     for (var i = 0; i < this.path.length; i++) {
         this.spawn.room.getPositionAt(this.path[i].x, this.path[i].y).createConstructionSite(STRUCTURE_ROAD)
     }
-    for (var creepId in this.game.creeps) {
-        var creep = this.game.creeps[creepId]
-        if (creep.memory.groupId !== this.id) {
-            continue
-        }
+    for (var creepId in this.creeps) {
+        var creep = this.creeps[creepId]
         if (creep.pos.isNearTo(this.source) && (creep.carry.energy < creep.carryCapacity)) {
             Assert.check(creep.harvest(this.source))
         } else if (creep.carry.energy <= 0) {

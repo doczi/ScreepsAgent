@@ -1,6 +1,7 @@
 function CreepAllocator(creeps) {
     this.creeps = creeps
     this.pool = {}
+    this.groups = {}
     this.allocations = {}
     this.reset()
 }
@@ -20,6 +21,7 @@ CreepAllocator.prototype.reset = function() {
 }
 
 CreepAllocator.prototype.allocateFixed = function(group, role, count) {
+    this.groups[group.id] = group
     const allocatedCount = Math.min(count, this.getAvailableCount(role))
     this.pool[role] -= allocatedCount
     if (!(group.id in this.allocations)) {
@@ -76,6 +78,14 @@ CreepAllocator.prototype.assignCreeps = function() {
             var creep = extras[role].pop()
             creep.memory.groupId = groupId
             this.allocations[groupId][creep.memory.role]--
+        }
+    }
+
+    for (creepId in this.creeps) {
+        const creep = this.creeps[creepId]
+        const groupId = creep.memory.groupId
+        if (groupId !== undefined) {
+            this.groups[groupId].creeps[creep.id] = creep
         }
     }
 }

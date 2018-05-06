@@ -21,6 +21,7 @@ function Build(game, memory, spawn) {
     }
 
     this.id = id
+    this.creeps = {}
     this.game = game
     this.spawn = game.getObjectById(this.memory.spawnId)
     this.source = game.getObjectById(this.memory.sourceId)
@@ -48,11 +49,8 @@ Build.prototype.execute = function() {
     for (var i = 0; i < offsets.length; i++) {
         this.spawn.room.getPositionAt(this.spawn.pos.x + offsets[i].x, this.spawn.pos.y + offsets[i].y).createConstructionSite(STRUCTURE_EXTENSION)
     }
-    for (var creepId in this.game.creeps) {
-        var creep = this.game.creeps[creepId]
-        if (creep.memory.groupId !== this.id) {
-            continue
-        }
+    for (var creepId in this.creeps) {
+        var creep = this.creeps[creepId]
         if (creep.pos.isNearTo(this.source) && (creep.carry.energy < creep.carryCapacity)) {
             Assert.check(creep.harvest(this.source))
         } else if (creep.carry.energy <= 0) {

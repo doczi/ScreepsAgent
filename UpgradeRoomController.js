@@ -21,6 +21,7 @@ function UpgradeRoomController(game, memory, controller) {
     }
 
     this.id = id
+    this.creeps = {}
     this.game = game
     this.controller = game.getObjectById(this.memory.controllerId)
     this.source = game.getObjectById(this.memory.sourceId)
@@ -37,11 +38,8 @@ UpgradeRoomController.prototype.execute = function() {
     for (var i = 0; i < this.path.length; i++) {
         this.controller.room.getPositionAt(this.path[i].x, this.path[i].y).createConstructionSite(STRUCTURE_ROAD)
     }
-    for (var creepId in Game.creeps) {
-        var creep = Game.creeps[creepId]
-        if (creep.memory.groupId !== this.id) {
-            continue
-        }
+    for (var creepId in this.creeps) {
+        var creep = this.creeps[creepId]
         if (creep.pos.isNearTo(this.source) && (creep.carry.energy < creep.carryCapacity)) {
             Assert.check(creep.harvest(this.source))
         } else if (creep.carry.energy <= 0) {

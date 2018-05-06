@@ -6,17 +6,20 @@ module.exports = {
     testConstructor: function() {
         var creeps = {
             creep1: {
+                id: 'creep1',
                 memory: {
                     role: 'worker'
                 }
             },
             creep2: {
+                id: 'creep2',
                 spawning: false,
                 memory: {
                     role: 'soldier'
                 }
             },
             creep3: {
+                id: 'creep3',
                 spawning: true,
                 memory: {
                     role: 'soldier'
@@ -29,21 +32,27 @@ module.exports = {
     },
 
     testAllocateFixed: function() {
-        const mine = { id: 'mine' }
+        const mine = {
+            id: 'mine',
+            creeps: {}
+        }
         var creeps = {
             creep1: {
+                id: 'creep1',
                 spawning: false,
                 memory: {
                     role: 'worker'
                 }
             },
             creep2: {
+                id: 'creep2',
                 spawning: false,
                 memory: {
                     role: 'worker'
                 }
             },
             creep3: {
+                id: 'creep3',
                 spawning: false,
                 memory: {
                     role: 'soldier'
@@ -69,28 +78,38 @@ module.exports = {
     },
 
     testAllocateRatio: function() {
-        const mine = { id: 'mine' }
-        const build = { id: 'build' }
+        const mine = {
+            id: 'mine',
+            creeps: {}
+        }
+        const build = {
+            id: 'build',
+            creeps: {}
+        }
         var creeps = {
             creep1: {
+                id: 'creep1',
                 spawning: false,
                 memory: {
                     role: 'worker'
                 }
             },
             creep2: {
+                id: 'creep2',
                 spawning: false,
                 memory: {
                     role: 'worker'
                 }
             },
             creep3: {
+                id: 'creep3',
                 spawning: false,
                 memory: {
                     role: 'worker'
                 }
             },
             creep4: {
+                id: 'creep4',
                 spawning: false,
                 memory: {
                     role: 'worker'
@@ -120,11 +139,21 @@ module.exports = {
     },
 
     testReallocate: function() {
-        const mine = { id: 'mine' }
-        const build = { id: 'build' }
-        const idle = { id: 'idle' }
+        const mine = {
+            id: 'mine',
+            creeps: {}
+        }
+        const build = {
+            id: 'build',
+            creeps: {}
+        }
+        const idle = {
+            id: 'idle',
+            creeps: {}
+        }
         var creeps = {
             creep1: {
+                id: 'creep1',
                 spawning: false,
                 memory: {
                     role: 'worker',
@@ -132,6 +161,7 @@ module.exports = {
                 }
             },
             creep2: {
+                id: 'creep2',
                 spawning: false,
                 memory: {
                     role: 'miner',
@@ -139,6 +169,7 @@ module.exports = {
                 }
             },
             creep3: {
+                id: 'creep3',
                 spawning: false,
                 memory: {
                     role: 'worker',
@@ -146,12 +177,14 @@ module.exports = {
                 }
             },
             creep4: {
+                id: 'creep4',
                 spawning: false,
                 memory: {
                     role: 'worker'
                 }
             },
             creep5: {
+                id: 'creep5',
                 spawning: true,
                 memory: {
                     role: 'worker'
@@ -172,10 +205,17 @@ module.exports = {
     },
 
     testAssignCreeps: function() {
-        const mine = { id: 'mine' }
-        const build = { id: 'build' }
+        const mine = {
+            id: 'mine',
+            creeps: {}
+        }
+        const build = {
+            id: 'build',
+            creeps: {}
+        }
         var creeps = {
             creep1: {
+                id: 'creep1',
                 spawning: false,
                 memory: {
                     role: 'worker',
@@ -183,6 +223,7 @@ module.exports = {
                 }
             },
             creep2: {
+                id: 'creep2',
                 spawning: false,
                 memory: {
                     role: 'miner',
@@ -190,6 +231,7 @@ module.exports = {
                 }
             },
             creep3: {
+                id: 'creep3',
                 spawning: false,
                 memory: {
                     role: 'worker',
@@ -197,12 +239,14 @@ module.exports = {
                 }
             },
             creep4: {
+                id: 'creep4',
                 spawning: false,
                 memory: {
                     role: 'worker'
                 }
             },
             creep5: {
+                id: 'creep5',
                 spawning: true,
                 memory: {
                     role: 'worker'
@@ -215,8 +259,12 @@ module.exports = {
         allocator.reallocate(mine)
         allocator.assignCreeps()
         Assert.assertEquals(mine.id, creeps.creep1.memory.groupId)
+        Assert.assertEquals(true, creeps.creep1.id in mine.creeps)
         Assert.assertEquals(mine.id, creeps.creep2.memory.groupId)
+        Assert.assertEquals(true, creeps.creep2.id in mine.creeps)
         Assert.assertEquals(build.id, creeps.creep3.memory.groupId)
+        Assert.assertEquals(true, creeps.creep3.id in build.creeps)
         Assert.assertEquals(build.id, creeps.creep4.memory.groupId)
+        Assert.assertEquals(true, creeps.creep4.id in build.creeps)
     }
 }
