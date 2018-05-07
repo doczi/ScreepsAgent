@@ -51,9 +51,9 @@ function initializeMemory()
 
 function updateGroups()
 {
-    groups.spawnCreeps = new SpawnCreeps(Game, Memory)
     for (spawnId in Game.spawns) {
         var spawn = Game.spawns[spawnId]
+        groups.push(new SpawnCreeps(Game, Memory, spawn))
         groups.push(new FillSpawn(Game, Memory, spawn))
         groups.push(new Build(Game, Memory, spawn))
 
@@ -64,13 +64,10 @@ function updateGroups()
 
 function allocateCreeps()
 {
-    var spawnAllocator = new CreepAllocator(Game.spawns)
     var creepAllocator = new CreepAllocator(Game.creeps)
     for (var groupId in groups) {
-        groups[groupId].allocateSpawns(spawnAllocator)
         groups[groupId].allocateCreeps(creepAllocator)
     }
-    spawnAllocator.assignCreeps()
     creepAllocator.assignCreeps()
 }
 

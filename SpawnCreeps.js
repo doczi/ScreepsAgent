@@ -1,4 +1,6 @@
-function SpawnCreeps(game, memory) {
+Assert = require('Assert')
+
+function SpawnCreeps(game, memory, spawn) {
     var id = 'SpawnCreeps'
     
     this.memory = memory.groups[id]
@@ -10,32 +12,35 @@ function SpawnCreeps(game, memory) {
     }
 
     this.id = id
-    this.creeps = {}
+    this.spawn = spawn
     this.game = game
     this.globalMemory = memory
-}
-
-
-SpawnCreeps.prototype.allocateSpawns = function(allocator) {
-    allocator.allocateRatio(this, 'spawn', 1)
+    const extensions = this.spawn.room.find(FIND_MY_STRUCTURES, { filter: { structureType: STRUCTURE_EXTENSION } })
+    this.totalCapacity = extensions.reduce((acc, extension) => acc + extension.energyCapacity, this.spawn.energyCapacity)
 }
 
 SpawnCreeps.prototype.allocateCreeps = function(allocator) {}
 
-SpawnCreeps.prototype.execute = function() {
-    const BASIC_WORKER = [ WORK, WORK, CARRY, MOVE ]
-    const BASIC_ATTACKER = [ ATTACK, ATTACK, MOVE, MOVE ]
+SpawnCreeps.prototype.bodyFromPattern = function(pattern) {
+    var body = []
+    var i = 0
+    var sum = BODYPART_COST[pattern[i]]
+    while (sum <= this.totalCapacity) {
+        body.push(pattern[i % pattern.length])
+        ++i
+        sum += BODYPART_COST[pattern[i % pattern.length]]
+    }
+    return body
+}
 
-    for (var spawnId in this.creeps) {
-        var spawn = this.creeps[spawnId]
-        if (spawn.room.find(FIND_MY_CREEPS).length > 10) {
-            continue
-        }
-        var creepToSpawn = BASIC_WORKER
-        var role = 'worker'
-        if (spawn.spawnCreep(creepToSpawn, role + this.globalMemory.nextId, { memory: { role: role} }) == OK) {
-            this.globalMemory.nextId++
-        }
+SpawnCreeps.prototype.execute = function() {
+    if (this.spawn.room.find(FIND_MY_CREEPS).length > 12) {
+        return
+    }
+    var creepToSpawn = this.bodyFromPattern([ MOVE, CARRY, WORK, WORK ])
+    var role = 'worker'
+    if (this.spawn.spawnCreep(creepToSpawn, role + this.globalMemory.nextId, { memory: { role: role} }) == OK) {
+        this.globalMemory.nextId++
     }
 }
 

@@ -28,8 +28,6 @@ function UpgradeRoomController(game, memory, controller) {
     this.path = Room.deserializePath(this.memory.serializedPath)
 }
 
-UpgradeRoomController.prototype.allocateSpawns = function(allocator) {}
-
 UpgradeRoomController.prototype.allocateCreeps = function(allocator) {
     allocator.allocateRatio(this, 'worker', 1)
 }

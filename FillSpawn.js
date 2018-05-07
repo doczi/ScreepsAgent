@@ -39,8 +39,6 @@ function FillSpawn(game, memory, spawn) {
     }
 }
 
-FillSpawn.prototype.allocateSpawns = function(allocator) {}
-
 FillSpawn.prototype.allocateCreeps = function(allocator) {
     if (this.target !== undefined) {
         allocator.allocateFixed(this, 'worker', 2)

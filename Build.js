@@ -29,10 +29,8 @@ function Build(game, memory, spawn) {
     this.path = Room.deserializePath(this.memory.serializedPath)
 }
 
-Build.prototype.allocateSpawns = function(allocator) {}
-
 Build.prototype.allocateCreeps = function(allocator) {
-    allocator.allocateFixed(this, 'worker', 1)
+    allocator.allocateFixed(this, 'worker', 2)
 }
 
 Build.prototype.createExtensions = function() {
@@ -65,8 +63,6 @@ Build.prototype.execute = function() {
                 Assert.check(creep.build(constructions[0]))
             } else if (structures.length > 0) {
                 Assert.check(creep.repair(structures[0]))
-            } else if (creep.pos.isNearTo(this.spawn)) {
-                Assert.check(creep.transfer(this.spawn, RESOURCE_ENERGY))
             } else if (creep.fatigue <= 0) {
                 Assert.check(creep.moveTo(this.spawn))
             }
