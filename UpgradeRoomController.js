@@ -9,13 +9,9 @@ function UpgradeRoomController(game, memory, controller) {
     
     this.memory = memory.groups[id]
     if (this.memory === undefined) {
-        var source = controller.pos.findClosestByPath(FIND_SOURCES)
-        memory.sources[source.id].users++
         this.memory = {
             id: id,
             controllerId: controller.id,
-            sourceId: source.id,
-            serializedPath: controller.pos.findPathTo(source, { ignoreCreeps: true, serialize: true })
         }
         memory.groups[id] = this.memory
     }
@@ -24,8 +20,11 @@ function UpgradeRoomController(game, memory, controller) {
     this.creeps = {}
     this.game = game
     this.controller = game.getObjectById(this.memory.controllerId)
-    this.source = game.getObjectById(this.memory.sourceId)
-    this.path = Room.deserializePath(this.memory.serializedPath)
+    const p = controller.pos
+    const terrain = this.controller.room.lookForAtArea(LOOK_TERRAIN, p.y - 1, p.x - 1, p.y + 1, p.x + 1, true)
+    const found = terrain.find(pos => pos.terrain == 'plain')
+    this.position = this.controller.room.getPositionAt(found.x, found.y)
+    this.container = this.position.lookFor(LOOK_STRUCTURES)
 }
 
 UpgradeRoomController.prototype.allocateCreeps = function(allocator) {
@@ -33,28 +32,18 @@ UpgradeRoomController.prototype.allocateCreeps = function(allocator) {
 }
 
 UpgradeRoomController.prototype.execute = function() {
-    for (var i = 0; i < this.path.length; i++) {
-        this.controller.room.getPositionAt(this.path[i].x, this.path[i].y).createConstructionSite(STRUCTURE_ROAD)
-    }
+    this.position.createConstructionSite(STRUCTURE_CONTAINER)
     for (var creepId in this.creeps) {
         var creep = this.creeps[creepId]
-        if (creep.pos.isNearTo(this.source) && (creep.carry.energy < creep.carryCapacity)) {
-            Assert.check(creep.harvest(this.source))
-        } else if (creep.carry.energy <= 0) {
-            if (creep.fatigue <= 0) {
-                Assert.check(creep.moveTo(this.source))
+        if (creep.pos.isEqualTo(this.position)) {
+            if (creep.carry.energy > 0) {
+                Assert.check(creep.upgradeController(this.controller))
+            } else {
+                Assert.check(creep.withdraw(this.container, RESOURCE_ENERGY, Math.min(this.container.store[RESOURCE_ENERGY], creep.carryCapacity)))
             }
         } else {
-            const constructions = creep.pos.findInRange(FIND_MY_CONSTRUCTION_SITES, 3, { filter: { structureType: STRUCTURE_ROAD } })
-            const structures = creep.pos.findInRange(FIND_STRUCTURES, 3, { filter: function(structure) { return structure.hits < structure.hitsMax } })
-            if (constructions.length > 0) {
-                Assert.check(creep.build(constructions[0]))
-            } else if (structures.length > 0) {
-                Assert.check(creep.repair(structures[0]))
-            } else if (creep.pos.inRangeTo(this.controller, 3)) {
-                Assert.check(creep.upgradeController(this.controller))
-            } else if (creep.fatigue <= 0) {
-                Assert.check(creep.moveTo(this.controller))
+            if (creep.fatigue <= 0) {
+                Assert.check(creep.moveTo(position))
             }
         }
     }

@@ -1,7 +1,8 @@
 CreepAllocator = require('CreepAllocator')
 SpawnCreeps = require('SpawnCreeps')
-FillSpawn = require('FillSpawn')
 Build = require('Build')
+Mine = require('Mine')
+FillSpawn = require('FillSpawn')
 UpgradeRoomController = require('UpgradeRoomController')
 
 
@@ -54,11 +55,16 @@ function updateGroups()
     for (spawnId in Game.spawns) {
         var spawn = Game.spawns[spawnId]
         groups.push(new SpawnCreeps(Game, Memory, spawn))
-        groups.push(new FillSpawn(Game, Memory, spawn))
         groups.push(new Build(Game, Memory, spawn))
+
+        var sources = spawn.room.find(FIND_SOURCES)
+        for (var i = 0; i < sources.length; ++i) {
+            groups.push(new Mine(Game, Memory, sources[i]))
+        }
 
         var controller = spawn.room.controller
         groups.push(new UpgradeRoomController(Game, Memory, controller))
+        groups.push(new FillSpawn(Game, Memory, spawn))
     }
 }
 

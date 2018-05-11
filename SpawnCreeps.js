@@ -34,12 +34,32 @@ SpawnCreeps.prototype.bodyFromPattern = function(pattern) {
 }
 
 SpawnCreeps.prototype.execute = function() {
-    if (this.spawn.room.find(FIND_MY_CREEPS).length > 12) {
-        return
+    var roles = {
+        builder: {
+            body: [ WORK, WORK, CARRY, MOVE ],
+            count: 0
+        },
+        miner: {
+            body: [ MOVE, WORK, WORK, MOVE, WORK, WORK, MOVE, WORK],
+            count: 0
+        },
+        carrier: {
+            body: [ MOVE, CARRY, CARRY ],
+            count: 0
+        }
     }
-    var creepToSpawn = this.bodyFromPattern([ MOVE, CARRY, WORK, WORK ])
-    var role = 'worker'
-    if (this.spawn.spawnCreep(creepToSpawn, role + this.globalMemory.nextId, { memory: { role: role} }) == OK) {
+    const creeps = this.spawn.room.find(FIND_MY_CREEPS).length
+    for (var i = 0; i < creeps.length; ++i) {
+        const creep = creeps[i]
+        roles[creep.role].count++
+    }
+    var creepToSpawn
+    if (roles.builder.count  < 10) {
+        creepToSpawn = 'builder'
+    } else if (roles.miner.count < this.spawn.room.find(FIND_SOURCES).length) {
+        creepToSpawn = 'miner'
+    }
+    if (this.spawn.spawnCreep(roles[creepToSpawn].body, creepToSpawn + this.globalMemory.nextId, { memory: { role: creepToSpawn} }) == OK) {
         this.globalMemory.nextId++
     }
 }
