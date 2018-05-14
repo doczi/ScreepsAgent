@@ -39,6 +39,10 @@ SpawnCreeps.prototype.execute = function() {
             body: [ WORK, WORK, CARRY, MOVE ],
             count: 0
         },
+        worker: {
+            body: [ WORK, WORK, CARRY, MOVE ],
+            count: 0
+        },
         miner: {
             body: [ MOVE, WORK, WORK, MOVE, WORK, WORK, MOVE, WORK],
             count: 0
