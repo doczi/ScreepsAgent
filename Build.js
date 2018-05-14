@@ -29,30 +29,30 @@ Build.prototype.allocateCreeps = function(allocator) {
 }
 
 Build.prototype.execute = function() {
-    const constructions = this.spawn.room.find(FIND_MY_CONSTRUCTION_SITES)
-    const structures = this.spawn.room.find(FIND_STRUCTURES, { filter: function(structure) { return structure.hits < structure.hitsMax } })
     for (var creepId in this.creeps) {
         var creep = this.creeps[creepId]
-        var source = creep.pos.findClosestByPath(FIND_SOURCES)
+        const construction = creep.pos.findClosestByPath(FIND_MY_CONSTRUCTION_SITES)
+        const structure = creep.pos.findClosestByPath(FIND_STRUCTURES, { filter: structure => structure.hits < structure.hitsMax })
+        const source = creep.pos.findClosestByPath(FIND_SOURCES)
         if (creep.pos.isNearTo(source) && (creep.carry.energy < creep.carryCapacity)) {
             Assert.check(creep.harvest(source))
         } else if (creep.carry.energy <= 0) {
             if (creep.fatigue <= 0) {
                 Assert.check(creep.moveTo(source))
             }
-        } else if (constructions.length > 0) {
-            if (creep.pos.inRangeTo(constructions[0],  3)) {
-                Assert.check(creep.build(constructions[0]))
+        } else if (construction != undefined) {
+            if (creep.pos.inRangeTo(construction, 3)) {
+                Assert.check(creep.build(construction))
             } else {
                 if (creep.fatigue <= 0) {
-                    Assert.check(creep.moveTo(constructions[0]))
+                    Assert.check(creep.moveTo(construction))
                 }
             }
-        } else if (structures.length > 0) {
-            if (creep.pos.inRangeTo(structures[0],  3)) {
-                Assert.check(creep.repair(structures[0]))
+        } else if (structure != undefined) {
+            if (creep.pos.inRangeTo(structure, 3)) {
+                Assert.check(creep.repair(structure))
             } else if (creep.fatigue <= 0) {
-                Assert.check(creep.moveTo(structures[0]))
+                Assert.check(creep.moveTo(structure))
             }
         }
     }

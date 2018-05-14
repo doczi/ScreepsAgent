@@ -15,8 +15,6 @@ function SpawnCreeps(game, memory, spawn) {
     this.spawn = spawn
     this.game = game
     this.globalMemory = memory
-    const extensions = this.spawn.room.find(FIND_MY_STRUCTURES, { filter: { structureType: STRUCTURE_EXTENSION } })
-    this.totalCapacity = extensions.reduce((acc, extension) => acc + extension.energyCapacity, this.spawn.energyCapacity)
 }
 
 SpawnCreeps.prototype.allocateCreeps = function(allocator) {}
@@ -25,7 +23,7 @@ SpawnCreeps.prototype.bodyFromPattern = function(pattern) {
     var body = []
     var i = 0
     var sum = BODYPART_COST[pattern[i]]
-    while (sum <= this.totalCapacity) {
+    while (sum <= this.spawn.room.energyCapacityAvailable) {
         body.push(pattern[i % pattern.length])
         ++i
         sum += BODYPART_COST[pattern[i % pattern.length]]
@@ -36,6 +34,10 @@ SpawnCreeps.prototype.bodyFromPattern = function(pattern) {
 SpawnCreeps.prototype.execute = function() {
     var roles = {
         builder: {
+            body: [ WORK, WORK, CARRY, MOVE ],
+            count: 0
+        },
+        worker: {
             body: [ WORK, WORK, CARRY, MOVE ],
             count: 0
         },

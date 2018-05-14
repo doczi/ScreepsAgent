@@ -1,14 +1,18 @@
 Assert = require('Assert')
 
 function Mine(game, memory, source) {
-    var id = memory.sources[source.id].mineId
+    var sourceMemory = memory.sources[source.id]
+    var id = sourceMemory.mineId
     if (id === undefined) {
         id = 'Mine' + memory.nextId++
-        memory.sources[source.id] = id
+        sourceMemory.mineId = id
     }
     
     this.memory = memory.groups[id]
     if (this.memory === undefined) {
+        const p = source.pos
+        const terrain = source.room.lookForAtArea(LOOK_TERRAIN, p.y - 1, p.x - 1, p.y + 1, p.x + 1, true)
+        const found = terrain.find(pos => pos.terrain == 'plain')
         this.memory = {
             id: id,
             sourceId: source.id,
@@ -20,14 +24,14 @@ function Mine(game, memory, source) {
     this.creeps = {}
     this.game = game
     this.source = source
-    const p = source.pos
-    const terrain = this.source.room.lookForAtArea(LOOK_TERRAIN, p.y - 1, p.x - 1, p.y + 1, p.x + 1, true)
-    const found = terrain.find(pos => pos.terrain == 'plain')
-    this.position = this.source.room.getPositionAt(found.x, found.y)
+    this.position = this.source.room.getPositionAt(sourceMemory.port.x, sourceMemory.port.y)
+    this.container = this.position.lookFor(LOOK_STRUCTURES)
 }
 
 Mine.prototype.allocateCreeps = function(allocator) {
-    allocator.allocateFixed(this, 'miner', 1)
+    if (this.container != undefined) {
+        allocator.allocateFixed(this, 'miner', 1)
+    }
 }
 
 Mine.prototype.execute = function() {
